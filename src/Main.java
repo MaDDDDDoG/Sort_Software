@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Main {
     static public void main(String[] args){
-        UI a = new UI();
+        Controller a = new Controller();
         System.out.println(System.getProperty("user.dir"));
     }
 }

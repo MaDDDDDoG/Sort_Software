@@ -4,36 +4,46 @@ import java.awt.*;
 
 public class UI extends JFrame{
     protected Container cp = getContentPane();
+    protected Node[] nodes;
     protected JToolBar preceding, processing;
     protected JComboBox select_type, select_datafrom, select_move, select_contour, select_sort;
     protected JButton finish, next, back, clear;
-    protected JLabel test;
-    protected JPanel node_panel;
+    protected JPanel node_panel, top_panel, bottom_panel;
 
     public UI(){
         super("XXX");
-        setBounds(300, 300, 1000, 400);
+        setBounds(100, 100, 1000, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
+        setNodes();
         setPreceding();
         setProcessing();
-        setNode();
     }
 
-    private void setNode(){
+    private void setNodes(){
         node_panel = new JPanel();
         node_panel.setBackground(Color.CYAN);
-
         cp.add(node_panel, BorderLayout.CENTER);
         node_panel.setLayout(null);
+
+        nodes = new Node[8];
+        int start_x = 80, start_y = 180, interval = 20;
+
+        for(int i=0;i<nodes.length;i++){
+            nodes[i] = new Node();
+            nodes[i].setLocation(start_x+i*(interval+Node.size), start_y);
+            node_panel.add(nodes[i]);
+        }
     }
 
     private void setPreceding(){
+        top_panel = new JPanel();
+        top_panel.setSize(1000, 50);
         preceding = new JToolBar();
 
         select_datafrom = new JComboBox();
-        select_datafrom.addItem("UI input");
+        select_datafrom.addItem("UI Input");
         select_datafrom.addItem("File");
         select_datafrom.addItem("Database");
         select_datafrom.addItem("Random");
@@ -64,11 +74,13 @@ public class UI extends JFrame{
         select_move.addItem("Line");
         preceding.add(select_move);
 
-
-        cp.add(preceding, BorderLayout.NORTH);
+        top_panel.add(preceding);
+        cp.add(top_panel, BorderLayout.NORTH);
     }
 
     private void setProcessing(){
+        bottom_panel = new JPanel();
+        bottom_panel.setSize(1000, 50);
         processing = new JToolBar();
 
         finish = new JButton("Finish");
@@ -83,6 +95,7 @@ public class UI extends JFrame{
         clear = new JButton("Clear");
         processing.add(clear);
 
-        cp.add(processing, BorderLayout.SOUTH);
+        bottom_panel.add(processing);
+        cp.add(bottom_panel, BorderLayout.SOUTH);
     }
 }
