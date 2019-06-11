@@ -4,7 +4,7 @@ import java.awt.event.MouseListener;
 import java.util.HashMap;
 
 public class Node extends JLabel{
-    static public String contour = "Circle";
+    static public String contour;
     static public String type_name;
     static public String[] property_type;
     static public String[] property_name;
@@ -12,16 +12,16 @@ public class Node extends JLabel{
     static public boolean is_object;
     private boolean live;
     private String name;
-    public HashMap<String, String> property;
+    private HashMap<String, String> property;
 
     public Node(){
         super();
-        live = false;
         is_object = false;
         property = new HashMap<>();
         update_Contour("None");
         setSize(size, size);
         add_or_delete();
+        setHorizontalTextPosition(JLabel.CENTER);
     }
 
     static public void ini_Node(String type, String... p){
@@ -39,19 +39,21 @@ public class Node extends JLabel{
             property_name = new String[p.length/2];
             property_type = new String[p.length/2];
 
-            for(int i=0;i<property_name.length;i++)
-                property_name[i] = p[i];
-            for(int i=0;i<property_type.length;i++)
-                property_type[i] = p[i+p.length/2];
+            for(int i=0, j=0;j<p.length;i++, j+=2)
+                property_name[i] = p[j];
+            for(int i=0, j=1;j<p.length;i++, j+=2)
+                property_type[i] = p[j];
         }
         property_size = property_name.length;
     }
 
     public void update_Contour(String contour){
+        if(contour.equals("None"))
+            live = false;
+        else
+            live = true;
         Icon icon = new ImageIcon("./contour/" + contour + ".png");
         setIcon(icon);
-        //setText("<html>First line<br>Second line</html>");
-        //setHorizontalTextPosition(JLabel.CENTER);
     }
 
     private void add_or_delete(){
@@ -60,11 +62,11 @@ public class Node extends JLabel{
             public void mouseClicked(MouseEvent e) {
                 int c = e.getButton();
                 if(c == MouseEvent.BUTTON1){ // click left mouse button
+                    content();
                     update_Contour(contour);
-                    live = true;
                 }else if(c == MouseEvent.BUTTON3){ // click right mouse button
-                    live = false;
                     update_Contour("None");
+                    print_property(true);
                 }
             }
 
@@ -82,6 +84,19 @@ public class Node extends JLabel{
         });
     }
 
+    public void clear_property(){
+        property.clear();
+        print_property(true);
+    }
+
+    private void content(){
+        new Node_Frame(this);
+    }
+
+    public void setProperty(String name, String value){
+        property.put(name, value);
+    }
+
     static public void setContour(String newcontour){
         contour = newcontour;
     }
@@ -90,11 +105,40 @@ public class Node extends JLabel{
         return live;
     }
 
+    public void print_property(boolean clear) {
+        if(clear) {
+            setText("");
+            return ;
+        }
+        String text = name;
+
+        if(is_object){
+            for(int i=0;i<property_size;i++){
+                text += "<br>" + property_name[i] + ": " + property.get(property_name[i]);
+            }
+        }
+        setText("<html>" + text + "</html>");
+    }
+
     static public void setIs_object(boolean is){
         is_object = is;
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getProperty(String key){
+        return property.get(key);
+    }
+
     @Override
     public void setLocation(int x, int y) {
         super.setLocation(x-size/2, y-size/2);
     }
+
 }

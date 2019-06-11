@@ -1,18 +1,69 @@
-import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Stack;
 
 public class Controller extends UI{
-    private String datafrom = "UI Input",  type = "Integer", move = "Parabola",
-                   contour = "Circle", sort = "Insertion Sort";
+    private String datafrom,  type, move, contour, sort;
+    private int[] live_index;
+    private Deque<SwapPair> process;
+    private Stack<SwapPair> used_pair;
+    private Timer process_timer;
+    private int progress, all;
 
     public Controller(){
         super();
+        Node.ini_Node(select_type.getSelectedItem().toString());
+        Node.setContour(select_contour.getSelectedItem().toString());
+        datafrom = "UI Input";
+        type = "Integer";
+        move = "Parabola";
+        contour = "Circle";
+        sort = "Insertion";
+        execute();
+    }
+
+    private void execute(){
         setDatafrom();
         setContour();
         setMove();
         setSort();
         setType();
+        setProcess_timer();
+        push_go();
+        push_stop();
+        push_initialize();
+        push_back();
+        push_clear();
+    }
+
+    private void setProcess_timer(){
+        ActionListener listener = new ActionListener(){
+            public void actionPerformed(ActionEvent event){
+                try{
+                    SwapPair p = process.pollFirst();
+                    used_pair.push(p);
+                    int a = live_index[p.first];
+                    int b = live_index[p.second];
+
+                    swap(a, b);
+                    System.out.println(p.first+"  "+p.second);
+                }catch(NullPointerException e){}  //queue is empty
+
+                progress++;
+                prompt.setText(progress + " / " + all);
+
+                if(process.isEmpty()){
+                    process_timer.stop();
+                }
+            }
+        };
+        process_timer = new Timer(3000, listener);
+        process_timer.setRepeats(true);
     }
 
     private void setDatafrom(){
@@ -79,8 +130,15 @@ public class Controller extends UI{
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     type = select_type.getSelectedItem().toString();
+
+                    for(int i=0;i<nodes.length;i++){
+                        nodes[i].clear_property();
+                        nodes[i].update_Contour("None");
+                    }
+
                     if(type.equals("Object")){
                         new Object_Frame();
+                        Node.setIs_object(true);
                     }else{
                         Node.ini_Node(type);
                         Node.setIs_object(false);
@@ -88,5 +146,152 @@ public class Controller extends UI{
                 }
             }
         });
+    }
+
+    private void push_initialize(){
+        initialize.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                progress = 0;
+
+                int n = 0;
+                for(int i=0;i<nodes.length;i++){
+                    if(nodes[i].getlive()) n++;
+                }
+
+                live_index = new int[n];  //index of live nodes
+                int[] temp_live = new int[n];
+                for(int i=0, j=0;i<nodes.length;i++){
+                    if(nodes[i].getlive()){
+                        live_index[j] = i;
+                        temp_live[j] = i;
+                        j++;
+                    }
+                }
+                Comparator<Node> cmp;
+                if(type.equals("Integer")){
+                    cmp = new IntCmp();
+                }else if(type.equals("Double")){
+                    cmp = new DoubleCmp();
+                }else if(type.equals("String")){
+                    cmp = new StringCmp();
+                }else{  //object
+                    cmp = new ObjectCmp();
+                }
+
+                if(sort.equals("Insertion")){
+                    process = Insertion.sort(nodes, temp_live, n, cmp);
+                }else if(sort.equals("Selection")){
+                    process = Selection.sort(nodes, temp_live, n, cmp);
+                }else if(sort.equals("Bubble")){
+                    process = Bubble.sort(nodes, temp_live, n, cmp);
+                }else if(sort.equals("Quick")){
+                    process = Quick.sort(nodes, temp_live, n, cmp);
+                }
+
+                used_pair = new Stack<>();
+
+                all = process.size();
+                prompt.setText(progress + " / " + all);
+            }
+        });
+    }
+
+    private void push_go(){
+        go.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                process_timer.start();
+            }
+        });
+    }
+
+    private void push_stop(){
+        stop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                process_timer.stop();
+            }
+        });
+    }
+
+    private void push_back(){
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(progress>0) {
+                    progress--;
+                    prompt.setText(progress + " / " + all);
+
+                    SwapPair p = used_pair.pop();
+                    swap(live_index[p.first], live_index[p.second]);
+                    process.offerFirst(p);
+                }
+            }
+        });
+    }
+
+    private void push_clear(){
+        clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                process_timer.stop();
+
+                prompt.setText("");
+                for(int i=0;i<nodes.length;i++){
+                    nodes[i].clear_property();
+                    nodes[i].update_Contour("None");
+                }
+            }
+        });
+    }
+
+    private void swap(int a, int b){
+        int ax = center_p(nodes[a].getX()), bx = center_p(nodes[b].getX());
+        int step = (bx - ax) / 10;
+        int center = (bx - ax) / 2;
+        int height = 70;
+        double coefficient = -height/Math.pow(center, 2);
+
+        ActionListener listener = new ActionListener(){
+            int count = 0;
+            public void actionPerformed(ActionEvent event){
+                if(move.equals("Line")) {
+                    nodes[a].setLocation(center_p(nodes[a].getX()) + step,
+                            center_p(nodes[a].getY()));
+                    nodes[b].setLocation(center_p(nodes[b].getX()) - step,
+                            center_p(nodes[b].getY()));
+                }else{
+                    if(count<5){ // raise slope
+                        int y = center_p(nodes[a].getY());
+                        int raise = (int)(coefficient*Math.pow(-center+count*step, 2)) + height;
+                        y = y - raise;
+                        nodes[a].setLocation(center_p(nodes[a].getX()) + step, y);
+                        nodes[b].setLocation(center_p(nodes[b].getX()) - step, y);
+                    }else{  // fall slope
+                        int y = center_p(nodes[a].getY());
+                        int fall = (int)(coefficient*Math.pow((count-4)*step, 2)) + height;
+                        y = y + fall;
+                        nodes[a].setLocation(center_p(nodes[a].getX()) + step, y);
+                        nodes[b].setLocation(center_p(nodes[b].getX()) - step, y);
+                    }
+                }
+
+                count++;
+                if(count>=10){
+                    Node temp = nodes[a];
+                    nodes[a] = nodes[b];
+                    nodes[b] = temp;
+                    ((Timer)event.getSource()).stop();
+                }
+            }
+        };
+        Timer timer = new Timer(200, listener);
+        timer.setRepeats(true);
+        timer.start();
+    }
+
+    private int center_p(int a){
+        return a + Node.size / 2;
     }
 }

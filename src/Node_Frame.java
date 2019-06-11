@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Node_Frame extends JFrame{
     private Container container = getContentPane();
@@ -12,34 +10,26 @@ public class Node_Frame extends JFrame{
         super(Node.type_name);
         setBounds(200, 200, 150, 150);
         setVisible(true);
-        pack();
 
         JPanel panel = new JPanel();
-        if(Node.is_object){
+        JLabel name_label = new JLabel("Name");
+        JTextField name_text = new JTextField();
+        JLabel[] pn = new JLabel[Node.property_size];
+        JTextField[] pv = new JTextField[Node.property_size];
+
+        if(Node.is_object){ //if object add name
             panel.setLayout(new GridLayout(Node.property_size+1, 2));
-            JLabel name_label = new JLabel("Name");
-            JTextField name_text = new JTextField();
             panel.add(name_label);
             panel.add(name_text);
-
-            JLabel[] pn = new JLabel[Node.property_size];
-            JTextField[] pv = new JTextField[Node.property_size];
-            for(int i=0;i<Node.property_size;i++){
-                pn[i] = new JLabel(Node.property_name[i]);
-                pv[i] = new JTextField();
-                panel.add(pn[i]);
-                panel.add(pv[i]);
-            }
         }else{
             panel.setLayout(new GridLayout(Node.property_size, 2));
-            JLabel[] pn = new JLabel[Node.property_size];
-            JTextField[] pv = new JTextField[Node.property_size];
-            for(int i=0;i<Node.property_size;i++){
-                pn[i] = new JLabel(Node.property_name[i]);
-                pv[i] = new JTextField();
-                panel.add(pn[i]);
-                panel.add(pv[i]);
-            }
+        }
+
+        for(int i=0;i<Node.property_size;i++){
+            pn[i] = new JLabel(Node.property_name[i]);
+            pv[i] = new JTextField();
+            panel.add(pn[i]);
+            panel.add(pv[i]);
         }
 
         container.add(panel, BorderLayout.CENTER);
@@ -51,23 +41,31 @@ public class Node_Frame extends JFrame{
             @Override
             public void windowClosing(WindowEvent e) { //close window get content
                 System.out.println("Close");
-                ob_name = name.getText();
-                if(ob_name.equals("")) ob_name = "A";
-
-                List<String> temp = new ArrayList<>();
-                for(int i=0;i<p.length;i++){
-                    if(!p[i].getText().equals("")){
-                        temp.add(p[i].getText());
-                        temp.add(t[i].getSelectedItem().toString());
-                    }
+                if(Node.is_object){
+                    a.setName(Inspector.check_string(name_text.getText())); //object name
+                }else{
+                    if(Node.type_name.equals("Integer"))  //if it is not object then name is value
+                        a.setName(Inspector.check_int(pv[0].getText()));
+                    else if(Node.type_name.equals("Double"))
+                        a.setName(Inspector.check_double(pv[0].getText()));
+                    else if(Node.type_name.equals("String"))
+                        a.setName(Inspector.check_string(pv[0].getText()));
                 }
 
-                String[] p = new String[temp.size()];
-                for(int i=0;i<p.length;i++){
-                    p[i] = temp.get(i);
+                for(int i=0;i<pv.length;i++){
+                    String temp = "";
+
+                    if(Node.property_type[i].equals("int"))
+                        temp = Inspector.check_int(pv[i].getText());
+                    else if(Node.property_type[i].equals("double"))
+                        temp = Inspector.check_double(pv[i].getText());
+                    else if(Node.property_type[i].equals("string"))
+                        temp = Inspector.check_string(pv[i].getText());
+
+                    a.setProperty(pn[i].getText(), temp);
                 }
-                Node.ini_Node(ob_name, p);
-                Node.setIs_object(true);
+
+                a.print_property(false);
             }
 
             @Override

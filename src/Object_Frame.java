@@ -28,9 +28,9 @@ public class Object_Frame extends JFrame {
             p[i] = new JTextField();
             panel.add(p[i]);
             t[i] = new JComboBox();
-            t[i].addItem("Integer");
-            t[i].addItem("Double");
-            t[i].addItem("String");
+            t[i].addItem("int");
+            t[i].addItem("double");
+            t[i].addItem("string");
             panel.add(t[i]);
         }
 
@@ -40,15 +40,13 @@ public class Object_Frame extends JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) { //close window get content
-                System.out.println("Close");
-                ob_name = name.getText();
-                if(ob_name.equals("")) ob_name = "A";
+                ob_name = Inspector.check_string(name.getText());
 
                 List<String> temp = new ArrayList<>();
                 for(int i=0;i<p.length;i++){
-                    if(!p[i].getText().equals("")){
-                        temp.add(p[i].getText());
-                        temp.add(t[i].getSelectedItem().toString());
+                    if(!p[i].getText().equals("")){  //load property name and type
+                        temp.add(Inspector.check_string(p[i].getText()));
+                        temp.add(Inspector.check_string(t[i].getSelectedItem().toString()));
                     }
                 }
 

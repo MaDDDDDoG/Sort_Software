@@ -7,8 +7,9 @@ public class UI extends JFrame{
     protected Node[] nodes;
     protected JToolBar preceding, processing;
     protected JComboBox select_type, select_datafrom, select_move, select_contour, select_sort;
-    protected JButton finish, next, back, clear;
+    protected JButton go, stop, back, clear, initialize;
     protected JPanel node_panel, top_panel, bottom_panel;
+    protected JLabel prompt;
 
     public UI(){
         super("XXX");
@@ -28,7 +29,7 @@ public class UI extends JFrame{
         node_panel.setLayout(null);
 
         nodes = new Node[8];
-        int start_x = 80, start_y = 180, interval = 20;
+        int start_x = 80, start_y = 300, interval = 20;
 
         for(int i=0;i<nodes.length;i++){
             nodes[i] = new Node();
@@ -57,11 +58,11 @@ public class UI extends JFrame{
         preceding.add(select_type);
 
         select_sort = new JComboBox();
-        select_sort.addItem("Insertion Sort");
-        select_sort.addItem("Selection Sort");
-        select_sort.addItem("Bubble Sort");
-        select_sort.addItem("Merge Sort");
-        select_sort.addItem("Quick Sort");
+        select_sort.addItem("Insertion");
+        select_sort.addItem("Selection");
+        select_sort.addItem("Bubble");
+        select_sort.addItem("Merge");
+        select_sort.addItem("Quick");
         preceding.add(select_sort);
 
         select_contour = new JComboBox();
@@ -74,7 +75,11 @@ public class UI extends JFrame{
         select_move.addItem("Line");
         preceding.add(select_move);
 
-        top_panel.add(preceding);
+        prompt = new JLabel();
+        top_panel.add(prompt, BorderLayout.WEST);
+
+        top_panel.add(preceding, BorderLayout.CENTER);
+
         cp.add(top_panel, BorderLayout.NORTH);
     }
 
@@ -83,11 +88,14 @@ public class UI extends JFrame{
         bottom_panel.setSize(1000, 50);
         processing = new JToolBar();
 
-        finish = new JButton("Finish");
-        processing.add(finish);
+        initialize = new JButton("Initialize");
+        processing.add(initialize);
 
-        next = new JButton("Next");
-        processing.add(next);
+        go = new JButton("Go");
+        processing.add(go);
+
+        stop = new JButton("Stop");
+        processing.add(stop);
 
         back = new JButton("Back");
         processing.add(back);
