@@ -47,6 +47,14 @@ public class Node extends JLabel{
         property_size = property_name.length;
     }
 
+    static public void setContour(String newcontour){
+        contour = newcontour;
+    }
+
+    static public void setIs_object(boolean is){
+        is_object = is;
+    }
+
     public void update_Contour(String contour){
         if(contour.equals("None"))
             live = false;
@@ -54,6 +62,51 @@ public class Node extends JLabel{
             live = true;
         Icon icon = new ImageIcon("./contour/" + contour + ".png");
         setIcon(icon);
+    }
+
+    public void clear_property(){
+        property.clear();
+        print_property(true);
+    }
+
+    public void setProperty(String name, String value){
+        property.put(name, value);
+    }
+
+    public void print_property(boolean clear) {
+        if(clear) {
+            setText("");
+            return ;
+        }
+        String text = name;
+
+        if(is_object){
+            for(int i=0;i<property_size;i++){
+                text += "<br>" + property_name[i] + ": " + property.get(property_name[i]);
+            }
+        }
+        setText("<html>" + text + "</html>");
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public boolean getlive(){
+        return live;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getProperty(String key){
+        return property.get(key);
+    }
+
+    @Override
+    public void setLocation(int x, int y) {
+        super.setLocation(x-size/2, y-size/2);
     }
 
     private void add_or_delete(){
@@ -84,61 +137,7 @@ public class Node extends JLabel{
         });
     }
 
-    public void clear_property(){
-        property.clear();
-        print_property(true);
-    }
-
     private void content(){
         new Node_Frame(this);
     }
-
-    public void setProperty(String name, String value){
-        property.put(name, value);
-    }
-
-    static public void setContour(String newcontour){
-        contour = newcontour;
-    }
-
-    public boolean getlive(){
-        return live;
-    }
-
-    public void print_property(boolean clear) {
-        if(clear) {
-            setText("");
-            return ;
-        }
-        String text = name;
-
-        if(is_object){
-            for(int i=0;i<property_size;i++){
-                text += "<br>" + property_name[i] + ": " + property.get(property_name[i]);
-            }
-        }
-        setText("<html>" + text + "</html>");
-    }
-
-    static public void setIs_object(boolean is){
-        is_object = is;
-    }
-
-    public void setName(String name){
-        this.name = name;
-    }
-
-    public String getName(){
-        return name;
-    }
-
-    public String getProperty(String key){
-        return property.get(key);
-    }
-
-    @Override
-    public void setLocation(int x, int y) {
-        super.setLocation(x-size/2, y-size/2);
-    }
-
 }

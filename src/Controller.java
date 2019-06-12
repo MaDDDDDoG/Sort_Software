@@ -8,12 +8,14 @@ import java.util.Stack;
 
 public class Controller extends UI{
     private String datafrom, type, move, contour, sort;
+    private int progress, all;
     private int[] live_index;
+    private String[] input_arr;
+
     private Deque<SwapPair> process;
     private Stack<SwapPair> used_pair;
     private Timer process_timer;
-    private int progress, all;
-    private String[] input_arr;
+
 
     public Controller(){
         super();
@@ -326,10 +328,6 @@ public class Controller extends UI{
         timer.start();
     }
 
-    private int center_p(int a){
-        return a + Node.size / 2;
-    }
-
     private void setInput_arr(){
         for(int i=0;i<input_arr.length;i++){
             nodes[i].update_Contour(contour);
@@ -337,5 +335,9 @@ public class Controller extends UI{
             nodes[i].setName(input_arr[i]);
             nodes[i].print_property(false);
         }
+    }
+
+    private int center_p(int a){
+        return a + Node.size / 2;
     }
 }
