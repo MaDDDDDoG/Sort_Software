@@ -1,19 +1,19 @@
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Stack;
 
 public class Controller extends UI{
-    private String datafrom,  type, move, contour, sort;
+    private String datafrom, type, move, contour, sort;
     private int[] live_index;
     private Deque<SwapPair> process;
     private Stack<SwapPair> used_pair;
     private Timer process_timer;
     private int progress, all;
+    private String[] input_arr;
 
     public Controller(){
         super();
@@ -51,7 +51,6 @@ public class Controller extends UI{
                     int b = live_index[p.second];
 
                     swap(a, b);
-                    System.out.println(p.first+"  "+p.second);
                 }catch(NullPointerException e){}  //queue is empty
 
                 progress++;
@@ -72,6 +71,42 @@ public class Controller extends UI{
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     datafrom = select_datafrom.getSelectedItem().toString();
+
+                    if(datafrom.equals("Random")){
+                        input_arr = Input.random_generate(type);
+                        setInput_arr();
+                    }else if(datafrom.equals("File")){
+                        JFrame in = new JFrame();
+                        Container container = in.getContentPane();
+                        in.setBounds(200, 200, 200, 100);
+                        in.setVisible(true);
+
+                        JTextField p = new JTextField();
+                        container.add(p);
+
+                        in.addWindowListener(new WindowListener() {
+                            @Override
+                            public void windowOpened(WindowEvent e) {}
+
+                            @Override
+                            public void windowClosing(WindowEvent e) { //close window get content
+                                try {
+                                    input_arr = Input.file(p.getText(), type);
+                                    setInput_arr();
+                                }catch (IOException io){}
+                            }
+
+                            @Override
+                            public void windowClosed(WindowEvent e) {}
+                            @Override
+                            public void windowIconified(WindowEvent e) {}
+                            @Override
+                            public void windowDeiconified(WindowEvent e) {}
+                            @Override
+                            public void windowActivated(WindowEvent e) {}
+                            @Override
+                            public void windowDeactivated(WindowEvent e) {}});
+                    }
                 }
             }
         });
@@ -293,5 +328,14 @@ public class Controller extends UI{
 
     private int center_p(int a){
         return a + Node.size / 2;
+    }
+
+    private void setInput_arr(){
+        for(int i=0;i<input_arr.length;i++){
+            nodes[i].update_Contour(contour);
+            nodes[i].setProperty(Node.property_name[0], input_arr[i]);
+            nodes[i].setName(input_arr[i]);
+            nodes[i].print_property(false);
+        }
     }
 }
