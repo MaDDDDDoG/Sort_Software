@@ -1,3 +1,5 @@
+import Sort.Node;
+
 import java.util.Comparator;
 
 public class DoubleCmp implements Comparator<Node> {

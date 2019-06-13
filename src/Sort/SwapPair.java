@@ -1,3 +1,5 @@
+package Sort;
+
 public class SwapPair {
     public int first, second;
 

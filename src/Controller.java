@@ -1,3 +1,5 @@
+import Sort.*;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
@@ -69,7 +71,7 @@ public class Controller extends UI{
                 }
             }
         };
-        process_timer = new Timer(2100, listener);
+        process_timer = new Timer(2200, listener);
         process_timer.setRepeats(true);
     }
 

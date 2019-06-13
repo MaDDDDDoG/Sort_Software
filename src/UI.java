@@ -1,3 +1,5 @@
+import Sort.Node;
+
 import javax.swing.*;
 import java.awt.*;
 

@@ -1,3 +1,6 @@
+import Sort.Inspector;
+import Sort.Node;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;

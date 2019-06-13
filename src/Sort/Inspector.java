@@ -1,3 +1,5 @@
+package Sort;
+
 public class Inspector {
     static public String check_int(String a){
         try{
