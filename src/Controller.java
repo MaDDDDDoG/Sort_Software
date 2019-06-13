@@ -1,10 +1,12 @@
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.*;
 import java.util.Comparator;
-import java.util.Deque;
-import java.util.Stack;
+import java.lang.reflect.Method;
+
 
 public class Controller extends UI{
     private String datafrom, type, move, contour, sort;
@@ -126,6 +128,43 @@ public class Controller extends UI{
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     sort = select_sort.getSelectedItem().toString();
+
+                    if(sort.equals("Other")){  // append new sort class file.
+                        JFrame in = new JFrame();
+                        Container container = in.getContentPane();
+                        in.setBounds(200, 200, 200, 100);
+                        in.setVisible(true);
+
+                        JTextField p = new JTextField();
+                        container.add(p);
+
+                        in.addWindowListener(new WindowListener() {
+                            @Override
+                            public void windowOpened(WindowEvent e) {}
+
+                            @Override
+                            public void windowClosing(WindowEvent e) { //close window get content
+                                try{
+                                    Class c = Class.forName(p.getText());
+                                    c.getMethod("sort", Node[].class, int[].class, int.class, Comparator.class);
+                                    sort = p.getText();
+                                }catch (Exception ex){
+                                    select_sort.setSelectedItem("Insertion");  // if class can not use, default insertion sort
+                                    sort = "Insertion";
+                                }
+                            }
+
+                            @Override
+                            public void windowClosed(WindowEvent e) {}
+                            @Override
+                            public void windowIconified(WindowEvent e) {}
+                            @Override
+                            public void windowDeiconified(WindowEvent e) {}
+                            @Override
+                            public void windowActivated(WindowEvent e) {}
+                            @Override
+                            public void windowDeactivated(WindowEvent e) {}});
+                    }
                 }
             }
         });
@@ -232,6 +271,15 @@ public class Controller extends UI{
                     process = Bubble.sort(nodes, temp_live, n, cmp);
                 }else if(sort.equals("Quick")){
                     process = Quick.sort(nodes, temp_live, n, cmp);
+                }else{  // other sort class
+                    try{
+                        Class c = Class.forName(sort);
+                        Method method = c.getMethod("sort", Node[].class, int[].class, int.class, Comparator.class);
+                        Object o = method.invoke(null, nodes, temp_live, n, cmp);
+                        process = (Deque)o;
+                    }catch (Exception ex){
+                        process = new LinkedList<>();  // if new class can not use, empty deque
+                    }
                 }
 
                 used_pair = new Stack<>();

@@ -63,6 +63,7 @@ public class UI extends JFrame{
         select_sort.addItem("Bubble");
         select_sort.addItem("Merge");
         select_sort.addItem("Quick");
+        select_sort.addItem("Other");
         preceding.add(select_sort);
 
         select_contour = new JComboBox();
