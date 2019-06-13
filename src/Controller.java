@@ -147,6 +147,12 @@ public class Controller extends UI{
                                 try{
                                     Class c = Class.forName(p.getText());
                                     c.getMethod("sort", Node[].class, int[].class, int.class, Comparator.class);
+
+                                    select_sort.removeItem("Other");
+                                    select_sort.addItem(p.getText());
+                                    select_sort.addItem("Other");
+                                    select_sort.setSelectedItem(p.getText());
+
                                     sort = p.getText();
                                 }catch (Exception ex){
                                     select_sort.setSelectedItem("Insertion");  // if class can not use, default insertion sort
@@ -271,6 +277,8 @@ public class Controller extends UI{
                     process = Bubble.sort(nodes, temp_live, n, cmp);
                 }else if(sort.equals("Quick")){
                     process = Quick.sort(nodes, temp_live, n, cmp);
+                }else if(sort.equals("Merge")){  //no merge
+                    process = new LinkedList<>();
                 }else{  // other sort class
                     try{
                         Class c = Class.forName(sort);
@@ -345,6 +353,7 @@ public class Controller extends UI{
     }
 
     private void swap(int a, int b){
+        round = true;
         int ax = center_p(nodes[a].getX()), bx = center_p(nodes[b].getX());
         int step = (bx - ax) / 10;
         int center = (bx - ax) / 2;
