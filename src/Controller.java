@@ -9,9 +9,9 @@ import java.util.Stack;
 public class Controller extends UI{
     private String datafrom, type, move, contour, sort;
     private int progress, all;
+    private boolean motion, round;
     private int[] live_index;
     private String[] input_arr;
-
     private Deque<SwapPair> process;
     private Stack<SwapPair> used_pair;
     private Timer process_timer;
@@ -26,6 +26,8 @@ public class Controller extends UI{
         move = "Parabola";
         contour = "Circle";
         sort = "Insertion";
+        motion = false;
+        round = false;
         execute();
     }
 
@@ -46,6 +48,7 @@ public class Controller extends UI{
     private void setProcess_timer(){
         ActionListener listener = new ActionListener(){
             public void actionPerformed(ActionEvent event){
+                motion = true;
                 try{
                     SwapPair p = process.pollFirst();
                     used_pair.push(p);
@@ -59,11 +62,12 @@ public class Controller extends UI{
                 prompt.setText(progress + " / " + all);
 
                 if(process.isEmpty()){
+                    motion = false;
                     process_timer.stop();
                 }
             }
         };
-        process_timer = new Timer(3000, listener);
+        process_timer = new Timer(2100, listener);
         process_timer.setRepeats(true);
     }
 
@@ -71,6 +75,8 @@ public class Controller extends UI{
         select_datafrom.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                if(motion) return;
+
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     datafrom = select_datafrom.getSelectedItem().toString();
 
@@ -166,6 +172,7 @@ public class Controller extends UI{
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
+                    if(motion) return;
                     type = select_type.getSelectedItem().toString();
 
                     for(int i=0;i<nodes.length;i++){
@@ -189,6 +196,7 @@ public class Controller extends UI{
         initialize.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(motion) return;
                 progress = 0;
 
                 int n = 0;
@@ -238,6 +246,7 @@ public class Controller extends UI{
         go.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                motion = true;
                 process_timer.start();
             }
         });
@@ -247,6 +256,7 @@ public class Controller extends UI{
         stop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                motion = false;
                 process_timer.stop();
             }
         });
@@ -256,6 +266,8 @@ public class Controller extends UI{
         back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(motion||round) return;  // if running then can not click
+
                 if(progress>0) {
                     progress--;
                     prompt.setText(progress + " / " + all);
@@ -272,6 +284,7 @@ public class Controller extends UI{
         clear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(motion) return;
                 process_timer.stop();
 
                 prompt.setText("");
@@ -289,11 +302,14 @@ public class Controller extends UI{
         int center = (bx - ax) / 2;
         int height = 70;
         double coefficient = -height/Math.pow(center, 2);
+        String move_ = move;  // type of one round
 
         ActionListener listener = new ActionListener(){
             int count = 0;
             public void actionPerformed(ActionEvent event){
-                if(move.equals("Line")) {
+                round = true;  // running
+
+                if(move_.equals("Line")) {
                     nodes[a].setLocation(center_p(nodes[a].getX()) + step,
                             center_p(nodes[a].getY()));
                     nodes[b].setLocation(center_p(nodes[b].getX()) - step,
@@ -320,6 +336,7 @@ public class Controller extends UI{
                     nodes[a] = nodes[b];
                     nodes[b] = temp;
                     ((Timer)event.getSource()).stop();
+                    round = false;
                 }
             }
         };
